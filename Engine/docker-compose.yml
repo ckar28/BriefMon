@@ -1,0 +1,58 @@
+
+
+services:
+  influxdb:
+    image: influxdb:2.7
+    env_file: .env
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_INIT_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_INIT_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN}
+    ports:
+      - "8087:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:latest
+    env_file: .env
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD}
+      - GF_DATAPROXY_TIMEOUT=600
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    
+    depends_on:
+      - influxdb
+
+  nmon-injector:
+    build: .
+    env_file: .env
+    command: >
+      --nmon-dir /data
+      --influx-url http://influxdb:8086
+      --influx-token ${INFLUXDB_TOKEN}
+      --influx-org ${INFLUXDB_ORG}
+      --influx-bucket ${INFLUXDB_BUCKET}
+      --debug
+    volumes:
+      - ../nmon-files:/data
+ 
+    depends_on:
+      influxdb:
+        condition: service_healthy
+
+volumes:
+  influxdb-data:

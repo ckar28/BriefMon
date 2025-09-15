@@ -1,0 +1,14 @@
+nmon-files/**
+!nmon-files/.gitkeep
+##############################
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.venv/
+Engine/build/
+Engine/*.spec
+.vscode/
+.DS_Store

@@ -1,0 +1,76 @@
+{
+  "id": 9,
+  "panels": [
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 0, "lineWidth": 1 },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "red", "value": 80 }] }
+        }
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "id": 2,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "query": "from(bucket: v.bucket)\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"nmon_metrics\")\n  |> filter(fn: (r) => r._field == \"physical_cpu\")\n  |> filter(fn: (r) => r.serial =~ /^${serials:regex}$/)\n  |> filter(fn: (r) => r.host =~ /^${lpars:regex}$/)\n  |> group(columns: [\"host\", \"serial\"])\n  |> aggregateWindow(every: 1h, fn: mean, createEmpty: false)\n  |> yield(name: \"Hourly_AvgCPU\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Hourly_AvgCPU",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 0, "lineWidth": 1 },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "red", "value": 80 }] }
+        }
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "id": 1,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": null,
+          "query": "from(bucket: v.bucket)\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"nmon_metrics\")\n  |> filter(fn: (r) => r._field == \"physical_cpu\")\n  |> filter(fn: (r) => r.serial =~ /^${serials:regex}$/)\n  |> filter(fn: (r) => r.host =~ /^${lpars:regex}$/)\n  |> group(columns: [\"host\", \"serial\"])\n  |> aggregateWindow(every: 1h, fn: max, createEmpty: false)\n  |> yield(name: \"Hourly_MaxCPU\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Hourly_MaxCPU",
+      "type": "timeseries"
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "bucket",
+        "type": "query",
+        "query": "buckets() |> keep(columns: [\"name\"]) |> distinct(column: \"name\") |> sort()"
+      },
+      {
+        "multi": true,
+        "includeAll": false,
+        "name": "serials",
+        "type": "query",
+        "query": "import \"influxdata/influxdb/schema\"\n\nschema.tagValues(\n  bucket: v.bucket,\n  tag: \"serial\",\n  predicate: (r) => r._measurement == \"nmon_metrics\",\n  start: -10y\n)"
+      },
+      {
+        "multi": true,
+        "includeAll": false,
+        "name": "lpars",
+        "type": "query",
+        "query": "import \"influxdata/influxdb/schema\"\n\nschema.tagValues(\n  bucket: v.bucket,\n  tag: \"host\",\n  predicate: (r) => r._measurement == \"nmon_metrics\" and r.serial =~ /^${serials:regex}$/,\n  start: -10y\n)"
+      }
+    ]
+  },
+  "time": { "from": "now-1y", "to": "now" },
+  "title": "Hourly Avg and Max CPU of Lpars in Selected Servers",
+  "uid": "ed47bf03-5f9f-4fab-be84-72fb1c16789c"
+}

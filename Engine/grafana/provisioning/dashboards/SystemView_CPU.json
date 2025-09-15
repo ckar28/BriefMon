@@ -1,0 +1,47 @@
+{
+  "id": 31,
+  "uid": "system_view_cpu",
+  "title": "System CPU View",
+  "panels": [
+    {
+      "datasource": null,
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 10 } } },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "id": 1,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "query": "from(bucket: v.bucket)\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"nmon_metrics\")\n  |> filter(fn: (r) => r._field == \"physical_cpu\")\n  |> filter(fn: (r) => r.serial =~ /^${serials:regex}$/)\n  |> filter(fn: (r) => r.host =~ /^${lpars:regex}$/)\n\n  // 1. Group by each LPAR individually\n  |> group(columns: [\"serial\", \"host\"])\n\n  // 2. Find the hourly maximum for each LPAR\n  |> aggregateWindow(every: 1h, fn: max, createEmpty: false)\n\n  // 3. Group by time to sum the individual LPAR peaks\n  |> group(columns: [\"serial\", \"_time\"])\n\n  // 4. Sum the peaks\n  |> sum(column: \"_value\")\n\n// 5. Group by server to draw a line for each \n|> group(columns: [\"serial\"]) \n|> rename(columns: {_value: \"MAX_CPU\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "System MAX CPU :: Sum of Hourly Max CPU of LPARS",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 10 } } },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "id": 2,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "query": "from(bucket: v.bucket)\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"nmon_metrics\")\n  |> filter(fn: (r) => r._field == \"physical_cpu\")\n  |> filter(fn: (r) => r.serial =~ /^${serials:regex}$/)\n  |> filter(fn: (r) => r.host =~ /^${lpars:regex}$/)\n\n  // 1. Group by each LPAR individually\n  |> group(columns: [\"serial\", \"host\"])\n\n  // 2. Find the hourly 95th percentile for each LPAR\n  |> aggregateWindow(every: 1h, fn: (column, tables=<-) => tables |> quantile(q: 0.95, column: column), createEmpty: false)\n\n  // 3. Group by time to sum the individual LPAR percentiles\n  |> group(columns: [\"serial\", \"_time\"])\n\n  // 4. Sum the percentiles\n  |> sum(column: \"_value\")\n\n// 5. Group by server to draw a line for each \n|> group(columns: [\"serial\"]) \n|> rename(columns: {_value: \"95thPercentile_CPU\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "System Sustained CPU Load :: (Sum of Hourly 95th Percentile cpu of LPARS)",
+      "type": "timeseries"
+    }
+  ],
+  "templating": {
+    "list": [
+      { "name": "bucket", "type": "query", "query": "buckets() |> keep(columns: [\"name\"]) |> distinct(column: \"name\") |> sort()" },
+      { "multi": true, "includeAll": false, "name": "serials", "type": "query", "query": "import \"influxdata/influxdb/schema\"\n\nschema.tagValues(\n  bucket: v.bucket,\n  tag: \"serial\",\n  predicate: (r) => r._measurement == \"nmon_metrics\",\n  start: -10y\n)" },
+      { "multi": true, "includeAll": false, "name": "lpars", "type": "query", "query": "import \"influxdata/influxdb/schema\"\n\nschema.tagValues(\n  bucket: v.bucket,\n  tag: \"host\",\n  predicate: (r) => r._measurement == \"nmon_metrics\" and r.serial =~ /^${serials:regex}$/,\n  start: -10y\n)" }
+    ]
+  },
+  "time": { "from": "now-1y", "to": "now" },
+  "title": "System CPU View",
+  "uid": "system_view_cpu"
+}
