@@ -65,7 +65,7 @@ Just drop your files in a folder on your laptop, run one command, and see your d
 
 Here is an example of a dashboard, visualizing CPU consumption of multiple servers.
 
-![Sample Dashboard Screenshot](./assets/dashboard-screenshot.png)
+![Sample Dashboard Screenshot](./Engine//assets/dashboard-screenshot.png)
 
 
 
