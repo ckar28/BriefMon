@@ -5,7 +5,7 @@ Just drop your files in a folder on your laptop, run one command, and see your d
 
 **The highlight here is the 'briefcase' concept:** The entire analysis environment is self-contained and runs on your own laptop. It's designed for the professional who can take this with them to client sites, perfectly capturing the "analyze anywhere" spirit.
 
-**Currently the utility supports AIX nmon data for shared partitions. Support for AIX dedicated partitions LINUX Nmon data will be added soon** 
+**Currently the utility supports AIX nmon data for shared partitions. Support for AIX dedicated partitions and LINUX Nmon data will be added soon** 
 
 ### Prerequisites
 - **Docker Desktop**: You must have Docker Desktop installed and running on your computer. You can download it for free from the official Docker website for both Windows and Mac: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
