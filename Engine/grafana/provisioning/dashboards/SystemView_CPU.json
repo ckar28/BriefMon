@@ -1,5 +1,6 @@
 {
   "id": 31,
+  "timezone" : "utc",
   "uid": "system_view_cpu",
   "title": "System CPU View",
   "panels": [

@@ -1,5 +1,6 @@
 {
   "id": 32,
+  "timezone" : "utc",
   "uid": "system_view_mem",
   "title": "System Memory View (GB)",
   "panels": [

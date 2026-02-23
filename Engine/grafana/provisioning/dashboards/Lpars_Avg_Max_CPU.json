@@ -1,5 +1,6 @@
 {
   "id": 9,
+  "timezone" : "utc",
   "panels": [
     {
       "datasource": null,

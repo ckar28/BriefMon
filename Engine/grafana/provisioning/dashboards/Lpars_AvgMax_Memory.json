@@ -1,5 +1,6 @@
 {
   "id": 10,
+  "timezone" : "utc",
   "uid": "f908e4ba-6a0g-5abc-cf95-83ac2d17890d",
   "title": "Hourly Avg and Max Memory of Lpars in a Server (GB)",
   "panels": [
