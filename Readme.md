@@ -8,7 +8,7 @@ Just drop your files in a folder on your laptop, run one command, and see your d
 **Currently the utility supports AIX nmon data for shared partitions. Support for AIX dedicated partitions and LINUX Nmon data will be added soon** 
 
 ### Prerequisites
-- **Docker Desktop**: You must have Docker Desktop installed and running on your computer. You can download it for free from the official Docker website for both Windows and Mac: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+- **Docker Desktop**: You must have Docker Desktop installed and running on your computer. You can download it for free from the official Docker website: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
 
 ---
 
@@ -24,8 +24,7 @@ Just drop your files in a folder on your laptop, run one command, and see your d
 
 1.  **Open the the Engine folder of the BriefMon in Terminal**
     - Right-click on the Engine folder and select:
-        - **“Open in Terminal”** (Mac/Linux), or  
-        - **“Open in PowerShell / Terminal”** (Windows)
+        - **“Open in Terminal”** (Mac/Linux)
 
     This will open the terminal directly in the correct folder. No manual path or `cd` command is required.
 
